@@ -1,17 +1,14 @@
-const http = require("http");
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const app = express();
 
-app.use((req, res, next) => {
-  console.log("I am here!");
-  next();
-});
+const adminRouter = require("./routes/admin");
+const shopRouter = require("./routes/shop");
 
-app.use((req, res, next) => {
-  console.log("I am here again!");
-});
+app.use(bodyParser.urlencoded());
 
-const server = http.createServer(app);
+app.use(adminRouter);
+app.use(shopRouter);
 
-server.listen(3000);
+app.listen(3000);

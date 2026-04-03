@@ -1,7 +1,7 @@
 {
   "name": "nodejs-course",
   "version": "1.0.0",
-  "description": "Complete Node.js Guide",
+  "description": "Node.js Guide course",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,6 +14,7 @@
     "nodemon": "^1.18.3"
   },
   "dependencies": {
+    "body-parser": "^2.2.2",
     "express": "^5.2.1"
   }
 }
