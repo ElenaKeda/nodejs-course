@@ -4,32 +4,22 @@
   margin: auto;
 }
 
-.form-control {
-  margin: 1rem 0;
+.product-item {
+  width: 20rem;
+  max-width: 95%;
 }
 
-.form-control label,
-.form-control input {
-  display: block;
-  width: 100%;
+.product__title {
+  font-size: 1.2rem;
+  text-align: center;
 }
 
-.form-control input {
-  border: 1px solid #20aeb3;
-  font: inherit;
-  border-radius: 8px;
+.product__price {
+  text-align: center;
+  color: #4d4d4d;
+  margin-bottom: 0.5rem;
 }
 
-button {
-  font: inherit;
-  border: 1px solid #20aeb3;
-  border-radius: 8px;
-  color: #20aeb3;
-  background: #c0f3f5;
-  cursor: pointer;
-}
-
-button:hover,
-button:active {
-  background-color: azure;
+.product__description {
+  text-align: center;
 }
