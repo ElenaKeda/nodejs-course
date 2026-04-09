@@ -6,7 +6,7 @@ const products = [];
 
 router.get("/add-product", (req, res, next) => {
   console.log("Add product!");
-  res.render("add-product", { docTitle: "Add Product" });
+  res.render("add-product", { docTitle: "Add Product", path: '/admin/add-product' });
 });
 
 router.post("/add-product", (req, res, next) => {
