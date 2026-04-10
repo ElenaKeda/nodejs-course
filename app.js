@@ -1,20 +1,22 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
-const expessHbs = require("express-handlebars");
 
 const adminData = require("./routes/admin");
 const shopRouter = require("./routes/shop");
 
 const app = express();
 
-app.engine(
-  "handlebars",
-  expessHbs({ layoutsDir: "views/layouts/", defaultLayout: "main-layout" }),
-);
-app.set("view engine", "handlebars");
+app.set("view engine", "ejs");
 // second argument - name of the folder "views"
 app.set("views", "views");
+
+app.use((req, res, next) => {
+  // for ejs templates - if path and styles are undefinied
+  res.locals.path = req.path; 
+  res.locals.styles = [];
+  next();
+});
 
 app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname, "public")));
