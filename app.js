@@ -14,7 +14,7 @@ app.set("views", "views");
 
 app.use((req, res, next) => {
   // for ejs templates - if path and styles are undefinied
-  res.locals.path = req.path; 
+  res.locals.path = req.path;
   res.locals.styles = [];
   res.locals.editing = false;
   next();

@@ -22,11 +22,10 @@ exports.postAddProduct = (req, res, next) => {
     description,
   });
 
-  product.save();
-
-  console.log({ newProduct: product });
-
-  res.redirect("/");
+  product
+    .save()
+    .then(() => res.redirect("/"))
+    .catch((err) => console.log({ postAddProductError: err }));
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -38,18 +37,22 @@ exports.getEditProduct = (req, res, next) => {
 
   const productId = req.params.productId;
 
-  Product.findById(productId, (product) => {
-    if (!product) {
-      res.redirect("/");
-    }
-    res.render("admin/edit-product", {
-      docTitle: "Edit Product",
-      path: "/admin/edit-product",
-      styles: ["/css/product.css", "/css/forms.css"],
-      editing: editMode,
-      product,
-    });
-  });
+  Product.findById(productId)
+    .then(([products]) => {
+      const product = products[0];
+
+      if (!product) {
+        res.redirect("/");
+      }
+      res.render("admin/edit-product", {
+        docTitle: "Edit Product",
+        path: "/admin/edit-product",
+        styles: ["/css/product.css", "/css/forms.css"],
+        editing: editMode,
+        product,
+      });
+    })
+    .catch((err) => console.log({ getEditProductErr: err }));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -67,29 +70,31 @@ exports.postEditProduct = (req, res, next) => {
     description: updatedDescription,
   });
 
-  updatedProduct.save();
-
-  console.log({ updatedProduct });
-
-  res.redirect("/admin/products");
+  updatedProduct
+    .update()
+    .then(() => {
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
 
-  Product.deleteById(productId);
-
-  res.redirect("/admin/products");
-
+  Product.deleteById(productId)
+    .then(() => res.redirect("/admin/products"))
+    .catch((err) => console.log({ postDeleteProductErr: err }));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render("admin/products", {
-      prods: products,
-      docTitle: "Admin Products",
-      path: "/admin/products",
-      styles: ["/css/product.css"],
-    });
-  });
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("admin/products", {
+        prods: rows,
+        docTitle: "Admin Products",
+        path: "/admin/products",
+        styles: ["/css/product.css"],
+      });
+    })
+    .catch((err) => console.log({ getProductsError: err }));
 };
