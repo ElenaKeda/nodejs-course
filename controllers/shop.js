@@ -2,10 +2,10 @@ const Product = require("../models/product");
 const Cart = require("../models/cart");
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then(([rows, fieldData]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/product-list", {
-        prods: rows,
+        prods: products,
         docTitle: "All Products",
         path: "/products",
         styles: ["/css/product.css"],
@@ -16,10 +16,13 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const productId = req.params.productId;
-  Product.findById(productId)
-    .then(([product]) => {
+  // example, instead of "Product.findByPk(productId)" (but result is not an array)
+  // Product.findByPk(productId)
+
+  Product.findAll({ where: { id: productId } })
+    .then((products) => {
       res.render("shop/product-detail", {
-        product: product[0],
+        product: products[0],
         docTitle: "Product Detail",
         path: "/products",
       });
@@ -28,10 +31,10 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
-    .then(([rows, fieldData]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/index", {
-        prods: rows,
+        prods: products,
         docTitle: "Shop",
         path: "/",
         styles: ["/css/product.css"],
@@ -42,10 +45,10 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   Cart.getCart((cart) => {
-    Product.fetchAll()
-      .then(([rows, fieldData]) => {
+    Product.findAll()
+      .then((products) => {
         const cartProducts = [];
-        for (product of rows) {
+        for (product of products) {
           const cartProductData = cart.products.find(
             (prod) => prod.id === product.id,
           );
@@ -70,9 +73,9 @@ exports.getCart = (req, res, next) => {
 exports.postCart = (req, res, next) => {
   const productId = req.body.productId;
 
-  Product.findById(productId)
-    .then(([product]) => {
-      Cart.addProduct(productId, product[0].price);
+  Product.findByPk(productId)
+    .then((product) => {
+      Cart.addProduct(productId, product.price);
     })
     .then(() => res.redirect("/cart"))
     .catch((err) => console.log({ postCartErr: err }));
@@ -81,9 +84,9 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteItem = (req, res, next) => {
   const productId = req.body.productId;
 
-  Product.findById(productId)
-    .then(([product]) => {
-      Cart.deleteProduct(productId, product[0].price);
+  Product.findByPk(productId)
+    .then((product) => {
+      Cart.deleteProduct(productId, product.price);
     })
     .then(() => res.redirect("/cart"))
     .catch((err) => console.log({ postCartDeleteItemErr: err }));
