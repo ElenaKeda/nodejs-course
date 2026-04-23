@@ -5,20 +5,32 @@
 
   <main>
     <% if (products.length > 0) { %>
-        <ul>
+        <ul class="cart">
           <% for (let currentProduct of products) { %>
-            <li>
-              <p>
-                <%= currentProduct.title %> (<%= currentProduct.cartItem.quantity %>)
+            <li class="cart__item">
+              <p class="item__title">
+                <%= currentProduct.title %>
               </p>
-              <form action="/cart-delete-item" method="POST">
+              <p class="item__qty">
+                (<%= currentProduct.cartItem.quantity %>)
+              </p>
+              <p class="item__price">
+                $<%= currentProduct.price %>
+              </p>
+              <form class="item__actions" action="/cart-delete-item" method="POST">
                 <input type="hidden" name="productId" value="<%= currentProduct.id %>">
                 <button class="btn" type="submit">Delete</button>
               </form>
             </li>
           <% } %>
-          </ul>
-          <h2>Total price: $<%= totalPrice %></h2>
+        </ul>
+        <h3>Total price: $<%= totalPrice %></h3>
+        <hr>
+        <div class="centered">
+          <form action="/create-order" method="POST">
+            <button class="btn" type="submit">Order Now!</button>
+          </form>
+        </div>
       <% } else { %>
         <h1>No Products in the Cart!</h1>
       <% } %>  

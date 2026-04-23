@@ -1,5 +1,4 @@
 const Product = require("../models/product");
-const Cart = require("../models/cart");
 
 exports.getProducts = (req, res, next) => {
   Product.findAll()
@@ -50,11 +49,16 @@ exports.getCart = (req, res, next) => {
       return cart.getProducts();
     })
     .then((products) => {
+      const totalPrice = products.reduce((total, product) => {
+        return total + product.price * product.cartItem.quantity;
+      }, 0);
+
       res.render("shop/cart", {
         docTitle: "Cart",
         path: "/cart",
         products,
-        totalPrice: "0.00", // TODO
+        totalPrice,
+        styles: ["/css/cart.css"],
       });
     })
     .catch((err) => console.log({ getCartError: err }));
@@ -109,16 +113,42 @@ exports.postCartDeleteItem = (req, res, next) => {
     .catch((err) => console.log({ postCartDeleteItemErr: err }));
 };
 
-exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    docTitle: "Orders",
-    path: "/orders",
-  });
+exports.postOrder = (req, res, next) => {
+  let fetchedCart;
+
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      return req.user
+        .createOrder()
+        .then((order) => {
+          return order.addProducts(
+            products.map((prod) => {
+              prod.orderItem = { quantity: prod.cartItem.quantity };
+              return prod;
+            }),
+          );
+        })
+        .catch((err) => console.log({ postOrderNestedErr: err }));
+    })
+    .then(() => fetchedCart.setProducts(null))
+    .then(() => res.redirect("/orders"))
+    .catch((err) => console.log({ postOrderErr: err }));
 };
 
-exports.getCheckout = (req, res, next) => {
-  res.render("shop/checkout", {
-    docTitle: "Checkout",
-    path: "/checkout",
-  });
+exports.getOrders = (req, res, next) => {
+  req.user
+    .getOrders({ include: ["products"] })
+    .then((orders) => {
+      res.render("shop/orders", {
+        docTitle: "Orders",
+        path: "/orders",
+        orders,
+      });
+    })
+    .catch((err) => console.log({ getOrdersErr: err }));
 };

@@ -1,0 +1,38 @@
+.cart {
+  width: 40rem;
+  max-width: 90%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart__item {
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+
+.cart__item p {
+  margin: 0;
+}
+
+.item__title {
+  flex: 0 0 33%;
+}
+
+.item__qty,
+.item__price,
+.item__actions {
+  flex: 1;
+  text-align: center;
+}
+
+.item__actions {
+  display: flex;
+  justify-content: center;
+}
