@@ -18,7 +18,7 @@
                 $<%= currentProduct.price %>
               </p>
               <form class="item__actions" action="/cart-delete-item" method="POST">
-                <input type="hidden" name="productId" value="<%= currentProduct.id %>">
+                <input type="hidden" name="productId" value="<%= currentProduct._id %>">
                 <button class="btn" type="submit">Delete</button>
               </form>
             </li>
