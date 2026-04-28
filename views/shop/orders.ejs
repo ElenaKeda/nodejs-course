@@ -8,12 +8,12 @@
           <% orders.forEach(order => { %>
             <li class="cart__item">
               <h3>
-                # <%= order.id %>
+                Order # <%= order._id %>
               </h3>
               <ul>
-                <% order.products.forEach(product => { %>
+                <% order.items.forEach(product => { %>
                   <li>
-                    <%= product.title %> - (<%= product.orderItem.quantity %>)
+                    <%= product.title %> (<%= product.quantity %>) -  $<%= product.price %> (for 1 peace)
                   </li>
                 <% }) %>
               </ul>
