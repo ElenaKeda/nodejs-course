@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
@@ -28,7 +28,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/index", {
         prods: products,
@@ -74,7 +74,7 @@ exports.postCartDeleteItem = (req, res, next) => {
   const productId = req.body.productId;
 
   req.user
-    .deleteItemFromCart(productId)
+    .findByIdAndDelete(productId)
     .then(() => res.redirect("/cart"))
     .catch((err) => console.log({ postCartDeleteItemErr: err }));
 };
