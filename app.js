@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const adminRouter = require("./routes/admin");
 const shopRouter = require("./routes/shop");
+const authRouter = require("./routes/auth");
 
 const errorController = require("./controllers/error");
 
@@ -21,6 +22,9 @@ app.use((req, res, next) => {
   res.locals.path = req.path;
   res.locals.styles = [];
   res.locals.editing = false;
+  // TODO only for an example - draft!
+  res.locals.isAuthenticated = req.get("Cookie").split("=")[1] === "true";
+
   next();
 });
 
@@ -36,6 +40,7 @@ app.use((req, res, next) => {
     .catch((err) => console.log({ initializeErr: err }));
 });
 
+app.use(authRouter);
 app.use("/admin", adminRouter);
 app.use(shopRouter);
 

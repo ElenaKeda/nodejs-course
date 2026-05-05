@@ -19,19 +19,27 @@
           >Orders</a
         >
       </li>
+
+      <% if (isAuthenticated) { %>
+        <li class="main-header__item">
+          <a
+            class="<%= path === '/admin/add-product' ? 'active' : '' %>"
+            href="/admin/add-product"
+            >Add product</a
+          >
+        </li>
+        <li class="main-header__item">
+          <a
+            class="<%= path === '/admin/products' ? 'active' : '' %>"
+            href="/admin/products"
+            >Admin products</a
+          >
+        </li>
+      <% } %>
+    </ul>
+    <ul class="main-header__item-list">
       <li class="main-header__item">
-        <a
-          class="<%= path === '/admin/add-product' ? 'active' : '' %>"
-          href="/admin/add-product"
-          >Add product</a
-        >
-      </li>
-      <li class="main-header__item">
-        <a
-          class="<%= path === '/admin/products' ? 'active' : '' %>"
-          href="/admin/products"
-          >Admin products</a
-        >
+        <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">Login</a>
       </li>
     </ul>
   </nav>
@@ -54,19 +62,26 @@
           >Orders</a
         >
       </li>
+      <% if (isAuthenticated) { %>
+        <li class="mobile-nav__item">
+          <a
+            class="<%= path === '/admin/add-product' ? 'active' : '' %>"
+            href="/admin/add-product"
+            >Add Product
+          </a>
+        </li>
+        <li class="mobile-nav__item">
+          <a
+            class="<%= path === '/admin/products' ? 'active' : '' %>"
+            href="/admin/products"
+            >Admin Products
+          </a>
+        </li>
+      <% } %>
+    </ul>
+    <ul class="mobile-nav__item-list">
       <li class="mobile-nav__item">
-        <a
-          class="<%= path === '/admin/add-product' ? 'active' : '' %>"
-          href="/admin/add-product"
-          >Add Product
-        </a>
-      </li>
-      <li class="mobile-nav__item">
-        <a
-          class="<%= path === '/admin/products' ? 'active' : '' %>"
-          href="/admin/products"
-          >Admin Products
-        </a>
+        <a href="/login">Login</a>
       </li>
     </ul>
   </nav>
