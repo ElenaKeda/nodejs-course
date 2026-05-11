@@ -47,6 +47,7 @@
       <% } else { %>
       <li class="main-header__item">
           <form action="/logout" method="POST">
+            <%- include('../includes/csrf') %>
             <button class="btn" type="submit">Logout</button>
           </form>
         </li>
@@ -100,6 +101,7 @@
       <% } else { %>
         <li class="mobile-nav__item">
           <form action="/logout" method="POST">
+            <%- include('../includes/csrf') %>
             <button class="btn" type="submit">Logout</button>
           </form>
         </li>

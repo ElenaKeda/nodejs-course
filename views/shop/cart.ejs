@@ -18,6 +18,7 @@
                 $<%= currentProduct.price %>
               </p>
               <form class="item__actions" action="/cart-delete-item" method="POST">
+                <%- include('../includes/csrf') %>
                 <input type="hidden" name="productId" value="<%= currentProduct._id %>">
                 <button class="btn" type="submit">Delete</button>
               </form>
@@ -28,6 +29,7 @@
         <hr>
         <div class="centered">
           <form action="/create-order" method="POST">
+            <%- include('../includes/csrf') %>
             <button class="btn" type="submit">Order Now!</button>
           </form>
         </div>

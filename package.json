@@ -16,7 +16,9 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
+    "connect-flash": "^0.1.1",
     "connect-mongo": "^6.0.0",
+    "csurf": "^1.11.0",
     "ejs": "^5.0.1",
     "express": "^5.2.1",
     "express-handlebars": "3.0",
@@ -25,6 +27,7 @@
     "mongoose": "^9.6.1",
     "mysql2": "^3.22.1",
     "pug": "^3.0.4",
+    "save": "^2.9.0",
     "sequelize": "^6.37.8"
   }
 }

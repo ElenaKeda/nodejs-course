@@ -4,18 +4,24 @@ const User = require("../models/user");
 const user = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
+  const message = req.flash("error");
+
   res.render("auth/login", {
     docTitle: "Login Page",
     path: "/login",
     styles: ["/css/forms.css", "/css/auth.css"],
+    errorMessage: message[0],
   });
 };
 
 exports.getSignup = (req, res, next) => {
+  const message = req.flash("error");
+
   res.render("auth/signup", {
     docTitle: "Signup Page",
     path: "/signup",
     styles: ["/css/forms.css", "/css/auth.css"],
+    errorMessage: message[0],
   });
 };
 
@@ -26,12 +32,17 @@ exports.postLogin = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
+      req.flash("error", "Invalid email");
       return res.redirect("/signup");
     }
 
-    const isCorrectPassword = await bcrypt.compare(password, existingUser.password);
+    const isCorrectPassword = await bcrypt.compare(
+      password,
+      existingUser.password,
+    );
 
     if (!isCorrectPassword) {
+      req.flash("error", "Invalid password");
       return res.redirect("/login");
     }
 
@@ -53,10 +64,12 @@ exports.postSignup = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
+      req.flash("error", "User already exists");
       return res.redirect("/login");
     }
 
     if (password !== confirmPassword) {
+      req.flash("error", "Invalid password");
       return res.redirect("/signup");
     }
 
