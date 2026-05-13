@@ -1,3 +1,5 @@
+require("dotenv").config({ quiet: true });
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -15,8 +17,7 @@ const errorController = require("./controllers/error");
 
 const User = require("./models/user");
 
-const MONGO_DB_URI =
-  "mongodb://elenakedamail_db_user:<password>@ac-nbsuhc2-shard-00-00.ixpnbhi.mongodb.net:27017,ac-nbsuhc2-shard-00-01.ixpnbhi.mongodb.net:27017,ac-nbsuhc2-shard-00-02.ixpnbhi.mongodb.net:27017/?ssl=true&replicaSet=atlas-tdt8x2-shard-0&authSource=admin&appName=Cluster0";
+const MONGO_DB_URI = `mongodb://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@ac-nbsuhc2-shard-00-00.ixpnbhi.mongodb.net:27017,ac-nbsuhc2-shard-00-01.ixpnbhi.mongodb.net:27017,ac-nbsuhc2-shard-00-02.ixpnbhi.mongodb.net:27017/?ssl=true&replicaSet=atlas-tdt8x2-shard-0&authSource=admin&appName=Cluster0`;
 
 const app = express();
 const csrfProtection = csrf();
@@ -26,7 +27,7 @@ app.set("views", "views"); // second argument - name of the folder "views"
 
 app.use(
   session({
-    secret: "secret_for_example",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoDbStore.create({
@@ -80,6 +81,6 @@ mongoose
   .then(() => {
     console.log("Connected!");
 
-    app.listen(3000);
+    app.listen(process.env.PORT);
   })
   .catch((err) => console.log({ mongooseConnectErr: err }));
