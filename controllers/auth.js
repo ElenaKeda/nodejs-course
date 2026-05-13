@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const user = require("../models/user");
 
+const transporter = require("../util/mail");
+
 exports.getLogin = (req, res, next) => {
   const message = req.flash("error");
 
@@ -84,6 +86,13 @@ exports.postSignup = async (req, res, next) => {
     await user.save();
 
     res.redirect("/login");
+
+    await transporter.sendMail({
+      to: email,
+      from: "shop@example.com",
+      subject: "Signup succeeded!",
+      html: "<h1>Welcome to the shop!</h1>",
+    });
   } catch (err) {
     console.log({ postSignUserErr: err });
   }
