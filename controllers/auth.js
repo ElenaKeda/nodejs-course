@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const User = require("../models/user");
 const user = require("../models/user");
@@ -104,4 +105,110 @@ exports.postLogout = (req, res, next) => {
 
     res.redirect("/login");
   });
+};
+
+exports.getReset = (req, res, next) => {
+  const message = req.flash("error");
+
+  res.render("auth/reset", {
+    docTitle: "Reset Password Page",
+    path: "/reset",
+    styles: ["/css/forms.css", "/css/auth.css"],
+    errorMessage: message[0],
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log({ postResetErr: err });
+      return res.redirect("/reset");
+    }
+
+    const token = buffer.toString("hex");
+
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash("error", "No account with that email found!");
+          return res.redirect("/reset");
+        }
+
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        user.save();
+      })
+      .then(() => {
+        res.redirect("/");
+        transporter.sendMail({
+          to: req.body.email,
+          from: "shop@example.com",
+          subject: "Password reset!",
+          html: `
+            <p>You requested a password reset!</p>
+            <p>Click this <a href="/${process.env.HOST}:${process.env.PORT}/reset/${token}">Link</a> to set a new password</p>
+          `,
+        });
+
+        // TODO remove it!
+        console.log({
+          htmlLink: `${process.env.HOST}:${process.env.PORT}/reset/${token}`,
+        });
+      })
+      .catch((err) => console.log({ postResetUserErr: err }));
+  });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+
+  User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      // TODO remove it!
+      console.log({ user });
+      const message = req.flash("error");
+
+      res.render("auth/new-password", {
+        docTitle: "New Password Page",
+        path: "/reset/:token",
+        styles: ["/css/forms.css", "/css/auth.css"],
+        errorMessage: message[0],
+        userId: user._id.toString(),
+        passwordToken: token,
+      });
+    })
+    .catch((err) => console.log({ getNewPasswordErr: err }));
+};
+
+// TODO does not work correctly
+exports.postNewPassword = async (req, res, next) => {
+  try {
+    const { password: newPassword, userId, passwordToken } = req.body;
+
+    const existingUser = await User.findOne({
+      resetToken: passwordToken,
+      resetTokenExpiration: { $gt: Date.now() },
+      _id: userId,
+    });
+
+    if (!existingUser) {
+      req.flash("error", "User not found");
+      return res.redirect("/login");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    existingUser.password = hashedPassword;
+    existingUser.resetToken = null;
+    existingUser.resetTokenExpiration = null;
+
+    await existingUser.save();
+
+    res.redirect("/login");
+  } catch (err) {
+    console.log({ postNewPasswordErr: err });
+  }
 };
