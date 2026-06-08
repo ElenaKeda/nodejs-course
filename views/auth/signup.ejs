@@ -5,7 +5,7 @@
   <%- include('../includes/error-message.ejs') %>
 
   <main>
-    <form class="login-form" action="/signup" method="POST">
+    <form class="login-form" action="/signup" method="POST" novalidate>
       <%- include('../includes/csrf') %>
       <div class="form-control">
         <label for="email">E-mail</label>

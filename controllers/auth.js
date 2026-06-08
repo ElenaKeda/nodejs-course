@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const user = require("../models/user");
@@ -63,6 +64,16 @@ exports.postLogin = async (req, res, next) => {
 exports.postSignup = async (req, res, next) => {
   try {
     const { email, password, confirmPassword } = req.body;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).render("auth/signup", {
+        docTitle: "Signup Page",
+        path: "/signup",
+        styles: ["/css/forms.css", "/css/auth.css"],
+        errorMessage: errors.array()[0].msg,
+      });
+    }
 
     const existingUser = await User.findOne({ email });
 
