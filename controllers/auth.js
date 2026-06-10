@@ -25,12 +25,24 @@ exports.getSignup = (req, res, next) => {
     path: "/signup",
     styles: ["/css/forms.css", "/css/auth.css"],
     errorMessage: message[0],
+    oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: [],
   });
 };
 
 exports.postLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).render("auth/login", {
+        docTitle: "Login Page",
+        path: "/login",
+        styles: ["/css/forms.css", "/css/auth.css"],
+        errorMessage: errors.array()[0].msg,
+      });
+    }
 
     const existingUser = await User.findOne({ email });
 
@@ -62,7 +74,7 @@ exports.postLogin = async (req, res, next) => {
 
 exports.postSignup = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, confirmPassword } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -71,6 +83,8 @@ exports.postSignup = async (req, res, next) => {
         path: "/signup",
         styles: ["/css/forms.css", "/css/auth.css"],
         errorMessage: errors.array()[0].msg,
+        oldInput: { email, password, confirmPassword },
+        validationErrors: errors.array(),
       });
     }
 
