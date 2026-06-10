@@ -73,7 +73,7 @@ exports.postLogin = async (req, res, next) => {
         styles: ["/css/forms.css", "/css/auth.css"],
         errorMessage: "Invalid password",
         oldInput: { email, password },
-        validationErrors: [],
+        validationErrors: errors.array(),
       });
     }
 

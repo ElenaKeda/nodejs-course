@@ -10,7 +10,23 @@ router.get("/login", authController.getLogin);
 
 router.get("/signup", authController.getSignup);
 
-router.post("/login", authController.postLogin);
+router.post(
+  "/login",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Please enter a valid email!")
+      .normalizeEmail(),
+    body(
+      "password",
+      "Please enter a password using only numbers and letters and at least 5 symbols",
+    )
+      .isLength({ min: 5 })
+      .isAlphanumeric()
+      .trim(),
+  ],
+  authController.postLogin,
+);
 
 router.post(
   "/signup",
@@ -24,13 +40,15 @@ router.post(
         if (existingUser) {
           return Promise.reject("User already exists");
         }
-      }),
+      })
+      .normalizeEmail(),
     body(
       "password",
       "Please enter a password using only numbers and letters and at least 5 symbols",
     )
       .isLength({ min: 5 })
-      .isAlphanumeric(),
+      .isAlphanumeric()
+      .trim(),
     body("confirmPassword").custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Passwords have no match!");
