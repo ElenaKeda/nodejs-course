@@ -14,6 +14,8 @@ exports.getLogin = (req, res, next) => {
     path: "/login",
     styles: ["/css/forms.css", "/css/auth.css"],
     errorMessage: message[0],
+    oldInput: { email: "", password: "" },
+    validationErrors: [],
   });
 };
 
@@ -41,14 +43,22 @@ exports.postLogin = async (req, res, next) => {
         path: "/login",
         styles: ["/css/forms.css", "/css/auth.css"],
         errorMessage: errors.array()[0].msg,
+        oldInput: { email, password },
+        validationErrors: errors.array(),
       });
     }
 
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      req.flash("error", "Invalid email");
-      return res.redirect("/signup");
+      return res.status(422).render("auth/login", {
+        docTitle: "Login Page",
+        path: "/login",
+        styles: ["/css/forms.css", "/css/auth.css"],
+        errorMessage: "Invalid email",
+        oldInput: { email, password },
+        validationErrors: [],
+      });
     }
 
     const isCorrectPassword = await bcrypt.compare(
@@ -57,8 +67,14 @@ exports.postLogin = async (req, res, next) => {
     );
 
     if (!isCorrectPassword) {
-      req.flash("error", "Invalid password");
-      return res.redirect("/login");
+      return res.status(422).render("auth/login", {
+        docTitle: "Login Page",
+        path: "/login",
+        styles: ["/css/forms.css", "/css/auth.css"],
+        errorMessage: "Invalid password",
+        oldInput: { email, password },
+        validationErrors: [],
+      });
     }
 
     req.session.isLoggedIn = true;
