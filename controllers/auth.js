@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
-const user = require("../models/user");
 
 const transporter = require("../util/mail");
 
@@ -63,7 +62,7 @@ exports.postLogin = async (req, res, next) => {
 
 exports.postSignup = async (req, res, next) => {
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -73,18 +72,6 @@ exports.postSignup = async (req, res, next) => {
         styles: ["/css/forms.css", "/css/auth.css"],
         errorMessage: errors.array()[0].msg,
       });
-    }
-
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      req.flash("error", "User already exists");
-      return res.redirect("/login");
-    }
-
-    if (password !== confirmPassword) {
-      req.flash("error", "Invalid password");
-      return res.redirect("/signup");
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
