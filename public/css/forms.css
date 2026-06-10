@@ -36,6 +36,7 @@ button:active {
   background-color: azure;
 }
 
-.form-control input.invalid {
+.form-control input.invalid,
+.form-control textarea.invalid {
   border-color: red;
 }
