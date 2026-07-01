@@ -84,7 +84,9 @@ exports.postLogin = async (req, res, next) => {
       res.redirect("/");
     });
   } catch (err) {
-    console.log({ postLoginErr: err });
+    const error = new Error(err);
+    error.httpStattusCode = 500;
+    return next(error);
   }
 };
 
@@ -123,7 +125,9 @@ exports.postSignup = async (req, res, next) => {
       html: "<h1>Welcome to the shop!</h1>",
     });
   } catch (err) {
-    console.log({ postSignUserErr: err });
+    const error = new Error(err);
+    error.httpStattusCode = 500;
+    return next(error);
   }
 };
 
@@ -177,13 +181,12 @@ exports.postReset = (req, res, next) => {
             <p>Click this <a href="/${process.env.HOST}:${process.env.PORT}/reset/${token}">Link</a> to set a new password</p>
           `,
         });
-
-        // TODO remove it!
-        console.log({
-          htmlLink: `${process.env.HOST}:${process.env.PORT}/reset/${token}`,
-        });
       })
-      .catch((err) => console.log({ postResetUserErr: err }));
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStattusCode = 500;
+        return next(error);
+      });
   });
 };
 
@@ -195,8 +198,6 @@ exports.getNewPassword = (req, res, next) => {
     resetTokenExpiration: { $gt: Date.now() },
   })
     .then((user) => {
-      // TODO remove it!
-      console.log({ user });
       const message = req.flash("error");
 
       res.render("auth/new-password", {
@@ -208,7 +209,11 @@ exports.getNewPassword = (req, res, next) => {
         passwordToken: token,
       });
     })
-    .catch((err) => console.log({ getNewPasswordErr: err }));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };
 
 // TODO does not work correctly
@@ -237,6 +242,8 @@ exports.postNewPassword = async (req, res, next) => {
 
     res.redirect("/login");
   } catch (err) {
-    console.log({ postNewPasswordErr: err });
+    const error = new Error(err);
+    error.httpStattusCode = 500;
+    return next(error);
   }
 };

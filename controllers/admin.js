@@ -40,8 +40,12 @@ exports.postAddProduct = (req, res, next) => {
 
   product
     .save()
-    .then(() => res.redirect("/"))
-    .catch((err) => console.log({ postAddProductError: err }));
+    .then(() => res.redirect("/admin/products"))
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -66,7 +70,11 @@ exports.getEditProduct = (req, res, next) => {
         product,
       });
     })
-    .catch((err) => console.log({ getEditProductErr: err }));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -109,7 +117,11 @@ exports.postEditProduct = (req, res, next) => {
 
       product.save().then(() => res.redirect("/admin/products"));
     })
-    .catch((err) => console.log({ postEditProduct: err }));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -117,7 +129,11 @@ exports.postDeleteProduct = (req, res, next) => {
 
   Product.deleteOne({ _id: productId, userId: req.user._id })
     .then(() => res.redirect("/admin/products"))
-    .catch((err) => console.log({ postDeleteProductErr: err }));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getProducts = (req, res, next) => {
@@ -130,5 +146,9 @@ exports.getProducts = (req, res, next) => {
         styles: ["/css/product.css"],
       });
     })
-    .catch((err) => console.log({ getProductsError: err }));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
 };

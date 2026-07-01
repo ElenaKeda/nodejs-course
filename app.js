@@ -70,7 +70,7 @@ app.use(async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    next(err);
+    next(new Error(err));
   }
 });
 
@@ -78,7 +78,20 @@ app.use(authRouter);
 app.use("/admin", adminRouter);
 app.use(shopRouter);
 
+app.get("/500", errorController.get500);
 app.use(errorController.get404);
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  if (req.path === "/500") {
+    return res.status(500).render("500", {
+      docTitle: "500 Error",
+      path: "/500",
+    });
+  }
+
+  res.redirect("/500");
+});
 
 mongoose
   .connect(MONGO_DB_URI)
