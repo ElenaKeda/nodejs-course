@@ -3,3 +3,10 @@ exports.get404 = (req, res, next) => {
     docTitle: "Page not found",
   });
 };
+
+exports.get500 = (req, res, next) => {
+  res.status(500).render("500", {
+    docTitle: "500 Error!",
+    path: "/500",
+  });
+};
