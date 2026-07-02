@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -141,6 +144,40 @@ exports.getOrders = (req, res, next) => {
         docTitle: "Orders",
         path: "/orders",
         orders,
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStattusCode = 500;
+      return next(error);
+    });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+
+  Order.findById(orderId)
+    .then((currentOrder) => {
+      if (!currentOrder) {
+        return next(new Error("No order found!"));
+      }
+      if (currentOrder.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Unauthorized!"));
+      }
+
+      const invoiceName = `invoice-${orderId}.pdf`;
+      const invoicePath = path.join(
+        __dirname,
+        "..",
+        "data",
+        "invoices",
+        invoiceName,
+      );
+
+      res.download(invoicePath, invoiceName, (err) => {
+        if (err) {
+          next(err);
+        }
       });
     })
     .catch((err) => {

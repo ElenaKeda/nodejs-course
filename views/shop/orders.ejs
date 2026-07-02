@@ -13,7 +13,7 @@
               <ul>
                 <% order.products.forEach(product => { %>
                   <li>
-                    <%= product.product.title %> (<%= product.quantity %>) -  $<%= product.product.price %> (for 1 peace)
+                    <%= product.product.title %> (<%= product.quantity %>) -  $<%= product.product.price %> (for 1 peace) - <a href="/orders/<%= order._id %>">Invoice</a>
                   </li>
                 <% }) %>
               </ul>
