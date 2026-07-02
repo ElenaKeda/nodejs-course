@@ -1,27 +1,35 @@
 <%- include('../includes/head.ejs') %>
 
-  <body>
-    <%- include('../includes/navigation.ejs') %>
-    <main>
-      <% if (orders.length > 0) { %>
-        <ul class="cart">
-          <% orders.forEach(order => { %>
-            <li class="cart__item">
-              <h3>
-                Order # <%= order._id %>
-              </h3>
-              <ul>
-                <% order.products.forEach(product => { %>
-                  <li>
-                    <%= product.product.title %> (<%= product.quantity %>) -  $<%= product.product.price %> (for 1 peace) - <a href="/orders/<%= order._id %>">Invoice</a>
-                  </li>
-                <% }) %>
-              </ul>
-            </li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <h1>Nothing here!</h1>
-      <% } %>  
-    </main>
-<%- include('../includes/end.ejs') %>
+<body>
+  <%- include('../includes/navigation.ejs') %>
+
+  <main>
+    <% if (orders.length > 0) { %>
+      <ul class="cart">
+        <% orders.forEach(order => { %>
+          <li class="cart__item">
+            <h3>Order # <%= order._id %></h3>
+
+            <ul>
+              <% order.products.forEach(product => { %>
+                <li>
+                  <%= product.product.title %>
+                  (<%= product.quantity %>)
+                  - $<%= product.product.price %> (for 1 piece)
+                </li>
+              <% }) %>
+            </ul>
+
+            <p>
+              <a href="/orders/<%= order._id %>">📄 Download Invoice</a>
+            </p>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <h1>Nothing here!</h1>
+    <% } %>
+  </main>
+
+  <%- include('../includes/end.ejs') %>
+</body>

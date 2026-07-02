@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const PDFDocument = require("pdfkit");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -174,11 +175,37 @@ exports.getInvoice = (req, res, next) => {
         invoiceName,
       );
 
-      res.download(invoicePath, invoiceName, (err) => {
-        if (err) {
-          next(err);
-        }
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${invoiceName}"`,
+      );
+
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(24).text("Invoice");
+
+      pdfDoc.moveDown();
+
+      let totalPrice = 0;
+
+      currentOrder.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.product.price;
+
+        pdfDoc
+          .fontSize(14)
+          .text(
+            `${prod.product.title} - ${prod.quantity} × $${prod.product.price}`,
+          );
       });
+
+      pdfDoc.moveDown();
+
+      pdfDoc.fontSize(20).text(`Total: $${totalPrice}`);
+
+      pdfDoc.end();
     })
     .catch((err) => {
       const error = new Error(err);
