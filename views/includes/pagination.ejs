@@ -1,0 +1,17 @@
+<section class="pagination">
+  <% if (currentPage > 1) { %>
+    <a href="<%= path %>?page=<%= currentPage - 1 %>">&laquo;</a>
+  <% } %>
+
+  <% for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) { %>
+    <a
+      class="<%= currentPage === i ? 'active' : '' %>"
+      href="<%= path %>?page=<%= i %>">
+      <%= i %>
+    </a>
+  <% } %>
+
+  <% if (currentPage < Math.ceil(totalItems / itemsPerPage)) { %>
+    <a href="<%= path %>?page=<%= currentPage + 1 %>">&raquo;</a>
+  <% } %>
+</section>

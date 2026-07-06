@@ -254,6 +254,44 @@ form {
   background-color: azure;
 }
 
+.pagination {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination a {
+  text-decoration: none;
+  color: #20aeb3;
+  border: 1px solid #20aeb3;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 500;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pagination a:hover {
+  background-color: #20aeb3;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(32, 174, 179, 0.25);
+}
+
+.pagination a.active {
+  background-color: #20aeb3;
+  color: #fff;
+  border-color: #20aeb3;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: 0 3px 8px rgba(32, 174, 179, 0.35);
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

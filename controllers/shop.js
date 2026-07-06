@@ -4,22 +4,26 @@ const PDFDocument = require("pdfkit");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
+const { getPaginatedProducts } = require("../util/helpers");
 
-exports.getProducts = (req, res, next) => {
-  Product.find()
-    .then((products) => {
-      res.render("shop/product-list", {
-        prods: products,
-        docTitle: "All Products",
-        path: "/products",
-        styles: ["/css/product.css"],
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStattusCode = 500;
-      return next(error);
+exports.getProducts = async (req, res, next) => {
+  try {
+    const page = +req.query.page || 1;
+
+    const data = await getPaginatedProducts({}, page);
+
+    res.render("shop/product-list", {
+      prods: data.products,
+      currentPage: data.currentPage,
+      totalItems: data.totalItems,
+      itemsPerPage: data.itemsPerPage,
+      docTitle: "All Products",
+      path: "/products",
+      styles: ["/css/product.css"],
     });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getProduct = (req, res, next) => {
@@ -40,21 +44,24 @@ exports.getProduct = (req, res, next) => {
     });
 };
 
-exports.getIndex = (req, res, next) => {
-  Product.find()
-    .then((products) => {
-      res.render("shop/index", {
-        prods: products,
-        docTitle: "Shop",
-        path: "/",
-        styles: ["/css/product.css"],
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStattusCode = 500;
-      return next(error);
+exports.getIndex = async (req, res, next) => {
+  try {
+    const page = +req.query.page || 1;
+
+    const data = await getPaginatedProducts({}, page);
+
+    res.render("shop/index", {
+      prods: data.products,
+      currentPage: data.currentPage,
+      totalItems: data.totalItems,
+      itemsPerPage: data.itemsPerPage,
+      docTitle: "Shop",
+      path: "/",
+      styles: ["/css/product.css"],
     });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getCart = (req, res, next) => {

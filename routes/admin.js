@@ -3,6 +3,7 @@ const { check, body } = require("express-validator");
 
 const adminController = require("../controllers/admin");
 const isAuth = require("../middleware/isAuth");
+const ensurePageQuery = require("../middleware/ensurePageQuery");
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ const bodyCheckForProductEntuty = [
 router.get("/add-product", isAuth, adminController.getAddProduct);
 
 // admin/products => GET
-router.get("/products", isAuth, adminController.getProducts);
+router.get("/products", isAuth, ensurePageQuery, adminController.getProducts);
 
 // admin/add-product => POST
 router.post(

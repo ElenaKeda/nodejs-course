@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const fileHelper = require("../util/file");
 
 const Product = require("../models/product");
+const { getPaginatedProducts } = require("../util/helpers");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -161,19 +162,22 @@ exports.postDeleteProduct = (req, res, next) => {
     });
 };
 
-exports.getProducts = (req, res, next) => {
-  Product.find({ userId: req.user._id })
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        docTitle: "Admin Products",
-        path: "/admin/products",
-        styles: ["/css/product.css"],
-      });
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStattusCode = 500;
-      return next(error);
+exports.getProducts = async (req, res, next) => {
+  try {
+    const page = +req.query.page || 1;
+
+    const data = await getPaginatedProducts({ userId: req.user._id }, page);
+
+    res.render("admin/products", {
+      prods: data.products,
+      currentPage: data.currentPage,
+      totalItems: data.totalItems,
+      itemsPerPage: data.itemsPerPage,
+      docTitle: "Admin Products",
+      path: "/admin/products",
+      styles: ["/css/product.css"],
     });
+  } catch (err) {
+    next(err);
+  }
 };

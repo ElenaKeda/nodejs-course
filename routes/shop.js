@@ -2,12 +2,13 @@ const express = require("express");
 
 const shopController = require("../controllers/shop");
 const isAuth = require("../middleware/isAuth");
+const ensurePageQuery = require("../middleware/ensurePageQuery");
 
 const router = express.Router();
 
-router.get("/", shopController.getIndex);
+router.get("/", ensurePageQuery, shopController.getIndex);
 
-router.get("/products", shopController.getProducts);
+router.get("/products", ensurePageQuery, shopController.getProducts);
 
 router.get("/products/:productId", shopController.getProduct);
 

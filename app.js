@@ -78,6 +78,9 @@ app.use((req, res, next) => {
   res.locals.errorMessage = null;
   res.locals.userId = null;
   res.locals.passwordToken = null;
+  res.locals.currentPage = 0;
+  res.locals.totalItems = 0;
+  res.locals.itemsPerPage = 0;
 
   next();
 });
