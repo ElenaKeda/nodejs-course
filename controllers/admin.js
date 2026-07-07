@@ -143,23 +143,34 @@ exports.postEditProduct = (req, res, next) => {
     });
 };
 
-exports.postDeleteProduct = (req, res, next) => {
-  const productId = req.body.productId;
+exports.deleteProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.productId);
 
-  Product.findById(productId)
-    .then((product) => {
-      if (!product) {
-        return next(new Error("No product found!"));
-      }
-      fileHelper.deleteFile(product.imageUrl);
-      return Product.deleteOne({ _id: productId, userId: req.user._id });
-    })
-    .then(() => res.redirect("/admin/products"))
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStattusCode = 500;
-      return next(error);
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "Unauthorized.",
+      });
+    }
+
+    fileHelper.deleteFile(product.imageUrl);
+
+    await Product.deleteOne({
+      _id: product._id,
     });
+
+    res.status(200).json({
+      message: "Product deleted successfully.",
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getProducts = async (req, res, next) => {

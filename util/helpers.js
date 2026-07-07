@@ -1,6 +1,6 @@
 const Product = require("../models/product");
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 2;
 
 async function getPaginatedProducts(filter, page) {
   const totalItems = await Product.countDocuments(filter);
