@@ -120,30 +120,30 @@ exports.postCartDeleteItem = (req, res, next) => {
     });
 };
 
-exports.postOrder = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    .then((user) => {
-      const products = user.cart.items.map((item) => ({
-        product: { ...item.productId._doc },
-        quantity: item.quantity,
-      }));
+// exports.postOrder = (req, res, next) => {
+//   req.user
+//     .populate("cart.items.productId")
+//     .then((user) => {
+//       const products = user.cart.items.map((item) => ({
+//         product: { ...item.productId._doc },
+//         quantity: item.quantity,
+//       }));
 
-      const order = new Order({
-        user: { email: req.user.email, userId: req.user },
-        products,
-      });
+//       const order = new Order({
+//         user: { email: req.user.email, userId: req.user },
+//         products,
+//       });
 
-      return order.save();
-    })
-    .then(() => req.user.clearCart())
-    .then(() => res.redirect("/orders"))
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStattusCode = 500;
-      return next(error);
-    });
-};
+//       return order.save();
+//     })
+//     .then(() => req.user.clearCart())
+//     .then(() => res.redirect("/orders"))
+//     .catch((err) => {
+//       const error = new Error(err);
+//       error.httpStattusCode = 500;
+//       return next(error);
+//     });
+// };
 
 exports.getOrders = (req, res, next) => {
   Order.find({ "user.userId": req.user._id })
@@ -219,4 +219,33 @@ exports.getInvoice = (req, res, next) => {
       error.httpStattusCode = 500;
       return next(error);
     });
+};
+
+exports.getCheckout = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items.map((item) => ({
+        ...item.productId._doc,
+        quantity: item.quantity,
+      }));
+
+      const totalPrice = products.reduce((total, product) => {
+        return total + product.price * product.quantity;
+      }, 0);
+
+      res.render("shop/checkout", {
+        docTitle: "Checkout",
+        path: "/checkout",
+        styles: ["/css/checkout.css"],
+        products,
+        totalPrice,
+      });
+    })
+    .catch(next);
+};
+
+exports.postCheckout = (req, res, next) => {
+  console.log("postCheckout");
+  res.redirect("/orders");
 };

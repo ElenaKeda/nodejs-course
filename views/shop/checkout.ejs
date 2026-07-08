@@ -1,0 +1,71 @@
+<%- include('../includes/head.ejs') %>
+
+<body>
+  <%- include('../includes/navigation.ejs') %>
+
+  <main class="checkout">
+    <h1>Checkout</h1>
+    <% if (products.length > 0) { %>
+      <section class="checkout__summary">
+        <h2>Order Summary</h2>
+
+        <ul class="checkout__list">
+          <% products.forEach(product => { %>
+            <li class="checkout__item">
+              <div>
+                <strong><%= product.title %></strong>
+                <p>Quantity: <%= product.quantity %></p>
+              </div>
+
+              <div>
+                $<%= (product.price * product.quantity).toFixed(2) %>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+
+        <hr>
+
+        <div class="checkout__row">
+          <span>Subtotal</span>
+          <span>$<%= totalPrice.toFixed(2) %></span>
+        </div>
+
+        <div class="checkout__row">
+          <span>Shipping</span>
+          <span>Free</span>
+        </div>
+
+        <div class="checkout__row checkout__total">
+          <span>Total</span>
+          <span>$<%= totalPrice.toFixed(2) %></span>
+        </div>
+      </section>
+      <section class="checkout__payment">
+
+        <h2>Payment</h2>
+        <p>
+          Clicking the button below will redirect you to the secure Stripe
+          Checkout page.
+        </p>
+
+        <form action="/create-checkout-session" method="POST">
+          <%- include('../includes/csrf') %>
+
+          <button class="btn" type="submit" id="payment-btn">Proceed to Payment</button>
+        </form>
+
+      </section>
+
+    <% } else { %>
+
+      <h2>Your cart is empty.</h2>
+
+      <a href="/products" class="btn">
+        Continue Shopping
+      </a>
+
+    <% } %>
+  </main>
+
+<%- include('../includes/end.ejs') %>
