@@ -1,10 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const stripe = require("../config/stripe");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
 const { getPaginatedProducts } = require("../util/helpers");
+const { toStripeLineItems } = require("../util/stripe");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -120,31 +122,6 @@ exports.postCartDeleteItem = (req, res, next) => {
     });
 };
 
-// exports.postOrder = (req, res, next) => {
-//   req.user
-//     .populate("cart.items.productId")
-//     .then((user) => {
-//       const products = user.cart.items.map((item) => ({
-//         product: { ...item.productId._doc },
-//         quantity: item.quantity,
-//       }));
-
-//       const order = new Order({
-//         user: { email: req.user.email, userId: req.user },
-//         products,
-//       });
-
-//       return order.save();
-//     })
-//     .then(() => req.user.clearCart())
-//     .then(() => res.redirect("/orders"))
-//     .catch((err) => {
-//       const error = new Error(err);
-//       error.httpStattusCode = 500;
-//       return next(error);
-//     });
-// };
-
 exports.getOrders = (req, res, next) => {
   Order.find({ "user.userId": req.user._id })
     .then((orders) => {
@@ -244,8 +221,58 @@ exports.getCheckout = (req, res, next) => {
     })
     .catch(next);
 };
+// exports.postOrder = (req, res, next) => {
+//   req.user
+//     .populate("cart.items.productId")
+//     .then((user) => {
+//       const products = user.cart.items.map((item) => ({
+//         product: { ...item.productId._doc },
+//         quantity: item.quantity,
+//       }));
 
-exports.postCheckout = (req, res, next) => {
-  console.log("postCheckout");
-  res.redirect("/orders");
+//       const order = new Order({
+//         user: { email: req.user.email, userId: req.user },
+//         products,
+//       });
+
+//       return order.save();
+//     })
+//     .then(() => req.user.clearCart())
+//     .then(() => res.redirect("/orders"))
+//     .catch((err) => {
+//       const error = new Error(err);
+//       error.httpStattusCode = 500;
+//       return next(error);
+//     });
+// };
+
+exports.postCheckout = async (req, res, next) => {
+  try {
+    await req.user.populate("cart.items.productId");
+
+    const products = req.user.cart.items.map((item) => ({
+      ...item.productId._doc,
+      quantity: item.quantity,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+
+      payment_method_types: ["card"],
+
+      line_items: toStripeLineItems(products),
+
+      success_url: req.protocol + "://" + req.get("host") + "/checkout/success",
+
+      cancel_url: req.protocol + "://" + req.get("host") + "/checkout",
+    });
+
+    res.redirect(303, session.url);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getCheckoutSuccess = (req, res) => {
+  res.send("Payment successful!");
 };
