@@ -15,6 +15,7 @@ const shopRouter = require("./routes/shop");
 const authRouter = require("./routes/auth");
 
 const errorController = require("./controllers/error");
+const shopController = require("./controllers/shop");
 
 const User = require("./models/user");
 
@@ -47,6 +48,12 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+app.post(
+  "/webhook",
+  bodyParser.raw({ type: "application/json" }),
+  shopController.postWebhook,
+);
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -59,6 +66,8 @@ app.use(
 );
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(express.json());
 
 app.use(multer({ storage: fileStorage, fileFilter }).single("image"));
 

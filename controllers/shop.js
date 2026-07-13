@@ -5,6 +5,7 @@ const stripe = require("../config/stripe");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
+const User = require("../models/user");
 const { getPaginatedProducts } = require("../util/helpers");
 const { toStripeLineItems } = require("../util/stripe");
 
@@ -221,30 +222,6 @@ exports.getCheckout = (req, res, next) => {
     })
     .catch(next);
 };
-// exports.postOrder = (req, res, next) => {
-//   req.user
-//     .populate("cart.items.productId")
-//     .then((user) => {
-//       const products = user.cart.items.map((item) => ({
-//         product: { ...item.productId._doc },
-//         quantity: item.quantity,
-//       }));
-
-//       const order = new Order({
-//         user: { email: req.user.email, userId: req.user },
-//         products,
-//       });
-
-//       return order.save();
-//     })
-//     .then(() => req.user.clearCart())
-//     .then(() => res.redirect("/orders"))
-//     .catch((err) => {
-//       const error = new Error(err);
-//       error.httpStattusCode = 500;
-//       return next(error);
-//     });
-// };
 
 exports.postCheckout = async (req, res, next) => {
   try {
@@ -262,6 +239,10 @@ exports.postCheckout = async (req, res, next) => {
 
       line_items: toStripeLineItems(products),
 
+      metadata: {
+        userId: req.user._id.toString(),
+      },
+
       success_url: req.protocol + "://" + req.get("host") + "/checkout/success",
 
       cancel_url: req.protocol + "://" + req.get("host") + "/checkout",
@@ -274,5 +255,69 @@ exports.postCheckout = async (req, res, next) => {
 };
 
 exports.getCheckoutSuccess = (req, res) => {
-  res.send("Payment successful!");
+  res.redirect("/orders");
+};
+
+exports.postWebhook = async (req, res) => {
+  const signature = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
+  } catch (err) {
+    console.error("Webhook signature failed:", err.message);
+
+    return res.sendStatus(400);
+  }
+
+  console.log("Webhook verified!", event.type);
+
+  if (event.type === "checkout.session.completed") {
+    try {
+      const session = event.data.object;
+
+      const userId = session.metadata.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        console.log("User not found");
+        return res.sendStatus(200);
+      }
+
+      await user.populate("cart.items.productId");
+
+      const products = user.cart.items.map((item) => ({
+        product: {
+          ...item.productId._doc,
+        },
+        quantity: item.quantity,
+      }));
+
+      const order = new Order({
+        user: {
+          email: user.email,
+          userId: user._id,
+        },
+        products,
+      });
+
+      await order.save();
+
+      await user.clearCart();
+
+      console.log("Order created:", order._id);
+    } catch (err) {
+      console.error("Order creation failed:", err);
+
+      return res.sendStatus(500);
+    }
+  }
+
+  res.sendStatus(200);
 };
